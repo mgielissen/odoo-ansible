@@ -1,0 +1,32 @@
+- hosts: odoo
+  tasks:
+  - name: install all updates
+    apt:
+      upgrade: dist
+      update_cache: yes
+      autoremove: yes
+      autoclean: yes
+  - name: install postgres
+    apt:
+      name: postgresql
+  - name: install packages
+    apt:
+      name:
+        - python3
+        - python3-pip
+        - wget
+        - bzr
+        - git
+        - python-pip
+        - gdebi-core
+  - name: install wkhtmltopdf
+    action: shell sudo wget https://builds.wkhtmltopdf.org/0.12.1.3/wkhtmltox_0.12.1.3-1~bionic_amd64.deb -P /tmp ; sudo dpkg -i /tmp/wkhtmltox_0.12.1.3-1~bionic_amd64.deb ; sudo rm -f /tmp/wkhtmltox_0.12.1.3-1~bionic_amd64.deb
+  - name: install python packages
+    pip:
+      name:
+        - xlrd
+        - num2words
+        - xlwt
+      executable: pip3
+  - name: install odoo
+    action: shell sudo wget http://nightly.odoo.com/12.0/nightly/deb/odoo_12.0.latest_all.deb -P /tmp ; sudo dpkg -i /tmp/odoo_12.0.latest_all.deb ; sudo apt-get install -f -y ; sudo rm -f /tmp/odoo_12.0.latest_all.deb
