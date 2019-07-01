@@ -1,4 +1,4 @@
-- hosts: odoo
+- hosts: all
   tasks:
   - name: install all updates
     apt:
