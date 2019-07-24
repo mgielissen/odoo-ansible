@@ -36,3 +36,8 @@
     copy:
       src: odoo.conf
       dest: /etc/odoo/
+  - name: Started Odoo
+    service:
+      name: odoo
+      state: restarted
+      enabled: yes
