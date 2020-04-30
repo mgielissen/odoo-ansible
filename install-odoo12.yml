@@ -6,6 +6,9 @@
       update_cache: yes
       autoremove: yes
       autoclean: yes
+  - name: Set timezone to Europe/Amsterdam
+    timezone:
+      name: Europe/Amsterdam
   - name: Install postgres
     apt:
       name: postgresql
