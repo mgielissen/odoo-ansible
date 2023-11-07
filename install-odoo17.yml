@@ -21,8 +21,9 @@
         - bzr
         - git
         - gdebi-core
+        - wkhtmltopdf
   - name: Install wkhtmltopdf
-    action: shell sudo wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb -P /tmp ; sudo dpkg -i /tmp/wkhtmltox_0.12.5-1.bionic_amd64.deb ; sudo rm -f /tmp/wkhtmltox_0.12.5-1.bionic_amd64.deb ; sudo ln -s /usr/local/bin/wkhtmltopdf /usr/bin ; sudo ln -s /usr/local/bin/wkhtmltoimage /usr/bin
+    action: shell sudo ln -s /usr/local/bin/wkhtmltopdf /usr/bin ; sudo ln -s /usr/local/bin/wkhtmltoimage /usr/bin
   - name: install python packages
     pip:
       name:
