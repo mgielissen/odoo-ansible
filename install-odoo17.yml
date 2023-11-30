@@ -22,8 +22,6 @@
         - git
         - gdebi-core
         - wkhtmltopdf
-  - name: Install wkhtmltopdf
-    action: shell sudo ln -s /usr/local/bin/wkhtmltopdf /usr/bin ; sudo ln -s /usr/local/bin/wkhtmltoimage /usr/bin
   - name: install python packages
     pip:
       name:
