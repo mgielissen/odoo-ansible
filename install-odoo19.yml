@@ -1,0 +1,94 @@
+---
+- hosts: all
+  become: true  
+  vars:
+    odoo_version: "19.0"
+
+    wkhtmltopdf_url: "https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-2/wkhtmltox_0.12.6.1-2.jammy_amd64.deb"
+    odoo_deb_url: "https://nightly.odoo.com/{{ odoo_version }}/nightly/deb/odoo_{{ odoo_version }}.latest_all.deb"
+
+  tasks:
+    - name: Update apt cache and upgrade packages
+      apt:
+        upgrade: dist
+        update_cache: yes
+        autoremove: yes
+        autoclean: yes
+
+    - name: Set timezone to Europe/Amsterdam
+      timezone:
+        name: Europe/Amsterdam
+
+    - name: Install PostgreSQL
+      apt:
+        name: postgresql
+        state: present
+
+    - name: Install system dependencies
+      apt:
+        name:
+          - python3
+          - python3-pip
+          - python3-dev
+          - python3-venv
+          - wget
+          - git
+          - gdebi-core
+          - xfonts-75dpi
+          - xfonts-base
+        state: present
+
+    - name: Install Python packages via apt (System-wide)
+      apt:
+        name:
+          - python3-xlrd
+          - python3-num2words
+          - python3-xlwt
+          - python3-phonenumbers
+          - python3-qrcode
+          - python3-polib
+          - python3-pypdf
+        state: present
+
+    - name: Download wkhtmltopdf
+      get_url:
+        url: "{{ wkhtmltopdf_url }}"
+        dest: /tmp/wkhtmltox.deb
+
+    - name: Install wkhtmltopdf
+      apt:
+        deb: /tmp/wkhtmltox.deb
+        state: present
+
+    - name: Download Odoo {{ odoo_version }} Community
+      get_url:
+        url: "{{ odoo_deb_url }}"
+        dest: "/tmp/odoo_{{ odoo_version }}.latest_all.deb"
+
+    - name: Install Odoo {{ odoo_version }}
+      apt:
+        deb: "/tmp/odoo_{{ odoo_version }}.latest_all.deb"
+        state: present
+
+    - name: Create custom addons dir
+      file:
+        path: /opt/odoo/addons
+        state: directory
+        mode: '0755'
+        owner: odoo
+        group: odoo
+
+    - name: Config Odoo
+      copy:
+        src: odoo.conf
+        dest: /etc/odoo/odoo.conf
+        owner: odoo
+        group: odoo
+        mode: '0640'
+      notify: Restart Odoo
+
+  handlers:
+    - name: Restart Odoo
+      service:
+        name: odoo
+        state: restarted
