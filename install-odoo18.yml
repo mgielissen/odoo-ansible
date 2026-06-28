@@ -6,12 +6,15 @@
       update_cache: yes
       autoremove: yes
       autoclean: yes
+
   - name: Set timezone to Europe/Amsterdam
     timezone:
-      name: Europe/Amsterdam      
+      name: Europe/Amsterdam
+
   - name: Install postgres
     apt:
       name: postgresql
+
   - name: Install packages
     apt:
       name:
@@ -21,7 +24,26 @@
         - bzr
         - git
         - gdebi-core
-        - wkhtmltopdf
+
+  - name: Remove distro wkhtmltopdf if present
+    apt:
+      name: wkhtmltopdf
+      state: absent
+
+  - name: Download wkhtmltopdf jammy build
+    get_url:
+      url: https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.jammy_amd64.deb
+      dest: /tmp/wkhtmltox.deb
+      mode: '0644'
+
+  - name: Install wkhtmltopdf via gdebi
+    command: gdebi --non-interactive /tmp/wkhtmltox.deb
+
+  - name: Remove wkhtmltopdf deb
+    file:
+      path: /tmp/wkhtmltox.deb
+      state: absent
+
   - name: install python packages
     pip:
       name:
@@ -31,14 +53,19 @@
         - phonenumbers
         - qrcode
       executable: pip3
+      extra_args: "--break-system-packages"
+
   - name: Install Odoo
     action: shell sudo wget http://nightly.odoo.com/18.0/nightly/deb/odoo_18.0.latest_all.deb -P /tmp ; sudo dpkg -i /tmp/odoo_18.0.latest_all.deb ; sudo apt-get install -f -y ; sudo rm -f /tmp/odoo_18.0.latest_all.deb
+
   - name: Create custom addons dir
     action: shell sudo mkdir -p /opt/odoo/addons
+
   - name: Config Odoo
     copy:
       src: odoo.conf
       dest: /etc/odoo/
+
   - name: Restart Odoo
     service:
       name: odoo
